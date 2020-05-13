@@ -73,7 +73,6 @@ def play():
     global turn_num
     global game_over
 #Display Game Number Banner
-    version()
     print("--------------------------------------------------------------")
     print("                       Game: " + str(game_num) + "            *Wins  P:" + str(player_victories) + "  H:" + str(house_victories) + "   /")
     print("-----------------------------------------------------------")
