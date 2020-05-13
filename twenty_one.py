@@ -1,5 +1,6 @@
 import random
 
+#Vars
 player_hold = False
 house_hold = False
 initial_draw = True
@@ -10,6 +11,7 @@ turn_num = 1
 player_victories = 0
 house_victories = 0
 
+#Deck
 cards = [1, 1, 1, 1,
          2, 2, 2, 2,
          3, 3, 3, 3,
@@ -27,7 +29,7 @@ cards = [1, 1, 1, 1,
 player_hand = []
 house_hand = []
 
-next_card = 0
+next_card = 0 #value increases by 1 whenever a card is taken from the deck
 
 def reset_game():
     global cards
@@ -40,6 +42,7 @@ def reset_game():
     global turn_num
     global initial_draw
 
+#Reset deck to 52 cards
     cards = [1, 1, 1, 1,
          2, 2, 2, 2,
          3, 3, 3, 3,
@@ -53,7 +56,7 @@ def reset_game():
          10, 10, 10, 10,
          10, 10, 10, 10,
          10, 10, 10, 10]
-
+#Initialize Vars
     next_card = 0
     player_hand = []
     house_hand = []
@@ -62,30 +65,37 @@ def reset_game():
     initial_draw = True
     game_num += 1
     turn_num = 1
+#Start the game
     play()
 
 def play():
     global initial_draw
     global turn_num
     global game_over
+#Display Game Number Banner
+    version()
     print("--------------------------------------------------------------")
     print("                       Game: " + str(game_num) + "            *Wins  P:" + str(player_victories) + "  H:" + str(house_victories) + "   /")
     print("-----------------------------------------------------------")
+#Shuffle Deck and Deal Cards    
     random.shuffle(cards)
     draw(player_hand)
     draw(house_hand)
     draw(player_hand)
     draw(house_hand)
     initial_draw = False
+#Hold or Hit?
     while player_hold == False:
         take_turn()
         hold_or_hit()
         turn_num += 1
+#House continues if player holds first
     while player_hold == True and house_hold == False:
         if game_over == False:
             take_turn()
             house_check()
             turn_num += 1
+#Game Over
     if player_hold == True and house_hold == True:
         if game_over == False:
             compare_scores()
@@ -112,6 +122,7 @@ def draw(hand):
         print("The " + current_player + " draws")
     cards.pop(next_card)
     next_card += 1
+#BUST!
     if sum(hand) > 21:
         print(current_player + " BUSTS!")
         compare_scores()
@@ -120,8 +131,10 @@ def hold_or_hit():
     global player_hold
     loop = True
     while loop == True:
+#Ask the player
         print("Player Hand: " + str(player_hand) + " = " + str(sum(player_hand)))
         print("House Hand: " + str(house_hand[1:len(house_hand)]) + " = " + str(sum(house_hand[1:len(house_hand)])))
+#Player Response        
         response = input("Hold or Hit? ")
         response.lower()
         if response == "hold":
@@ -137,6 +150,7 @@ def hold_or_hit():
 
 def house_check():
     global house_hold
+#Casino Requirement
     if sum(house_hand) < 17:
         draw(house_hand)
     else:
@@ -148,8 +162,10 @@ def compare_scores():
     global house_victories
     global game_over
     VictoryScore = 21
+#Show Hands
     player_score = sum(player_hand)
     house_score = sum(house_hand)
+#Check Win Conditions
     if player_score == house_score:
         print("Player score: " + str(player_hand) + " = " + str(player_score))
         print("House score: " + str(house_hand) + " = " + str(house_score))
@@ -178,6 +194,7 @@ def compare_scores():
         print("unforseen situation")
         print("Player score: " + str(player_hand) + " = " + str(player_score))
         print("House score: " + str(house_hand) + " = " + str(house_score))
+#Play Again?    
     loop = True
     while loop == True:
         response = input("Play again? (Yes/No) ")
@@ -187,7 +204,7 @@ def compare_scores():
             loop = False
         elif response == "no":
             print("Thanks for playing!")
-            game_over = False
+            game_over = True
             loop = False
         else:
             print("Invalid option")
