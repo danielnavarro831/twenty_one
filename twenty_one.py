@@ -102,44 +102,35 @@ def cheat(card_value): #Call method before initial card draw in play()
             cards[0] = card_value
         counter +=1
 
-def bet():
-    global player_bank
-    global bet_min
-    loop = True
-    while loop == True:
-        print("Minimum bet amount is " + str(bet_min))
-        print("Player bank: " + str(player_bank))
-        response = input("Choose an amount to bet: ")
-        if(response.isdigit()) and int(response) >= bet_min:
-            player_bet = int(response)
-            player_bank -= player_bet
-            loop = False
-        else:
-            print("Invalid response")
-    reset()
-
 def payout(winner):
     global player_bank
     global player_bet
     global player_won_amount
     global house_won_amount
-    if winner == player:
+    chicken_dinner = ""
+    if winner == "player":
         player_bank += player_bet * 2
         player_won_amount += player_bet * 2
+        chicken_dinner = "Player wins $" + str(player_bet * 2) 
     elif winner == "house":
         house_won_amount += player_bet
+        chicken_dinner = "The House wins $" + str(player_bet)
     else:
         player_bank += player_bet
+        chicken_dinner = "Bets returned"
     player_bet = 0
+    print(chicken_dinner)
 
 def version():
     print("-----------------------------------------------------------------------------------------------------------------------")
-    print("                                     21 Card Game - Code by Daniel Navarro                                    ver: 1.13")
+    print("                                     21 Card Game - Code by Daniel Navarro                                    ver: 1.14")
     print("-----------------------------------------------------------------------------------------------------------------------")
 
 def rules():
-    print("Rules:")
-    print("Choose an amount to bet (minimum " + str(bet_min) + ")")
+    print("-------------------------")
+    print("   Rules               /")
+    print("-----------------------")
+    print("Choose an amount to bet")
     print("Each player is dealt 2 cards")
     print("Aces will automatically switch between 11 and 1 to accomodate the player's current score")
     print("Each turn, each player will be asked if they would like to hit (draw) or hold")
@@ -184,14 +175,40 @@ def reset_game():
 #Start the game
     play()
 
+def bet():
+    global player_bank
+    global player_bet
+    global bet_min
+    print("-------------------------")
+    print("   Bet                 /")
+    print("-----------------------")
+    loop = True
+    while loop == True:
+        print("Minimum bet amount is $" + str(bet_min))
+        print("Player bank: $" + str(player_bank))
+        response = input("Choose an amount to bet: ")
+        if(response.isdigit()) and int(response) >= bet_min:
+            player_bet = int(response)
+            player_bank -= player_bet
+            loop = False
+        else:
+            print("Invalid response")
+    reset_game()
+
 def play():
     global initial_draw
     global turn_num
     global game_over
+    global player_bet
+    global player_bank
+    global player_won_amount
+    global house_won_amount
 #Display Game Number Banner
-    print("--------------------------------------------------------------")
-    print("                       Game: " + str(game_num) + "           * Wins  P:" + str(player_victories) + "  H:" + str(house_victories) + "   /")
-    print("-----------------------------------------------------------")
+    print("-----------------------------------------------------------------------------------------------------------------------")
+    print("  Game: " + str(game_num) + "      Player Bank: $" + str(player_bank) 
+          + "      Current Bet: $" + str(player_bet) + "      Player Won: $" + str(player_won_amount) 
+          + "      House Won: $" + str(house_won_amount) + "      * Wins  P:" + str(player_victories) + "  H:" + str(house_victories))
+    print("-----------------------------------------------------------------------------------------------------------------------")
 #Shuffle Deck and Deal Cards    
     random.shuffle(cards)
     if debugging_player == True:
@@ -367,6 +384,7 @@ def compare_scores():
         print("unforseen situation")
         print("Player score: " + str(player_hand) + " = " + str(player_score))
         print("House score: " + str(house_hand) + " = " + str(house_score))
+    play_again()
 
 #Play Again
 def play_again():  
