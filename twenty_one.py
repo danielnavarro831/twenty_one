@@ -102,6 +102,10 @@ def cheat(card_value): #Call method before initial card draw in play()
             cards[0] = card_value
         counter +=1
 
+def bet_first_born():
+    global player_bank
+    player_bank += 100
+
 def payout(winner):
     global player_bank
     global player_bet
@@ -179,6 +183,7 @@ def bet():
     global player_bank
     global player_bet
     global bet_min
+    global debug
     print("-------------------------")
     print("   Bet                 /")
     print("-----------------------")
@@ -187,12 +192,15 @@ def bet():
         print("Minimum bet amount is $" + str(bet_min))
         print("Player bank: $" + str(player_bank))
         response = input("Choose an amount to bet: ")
-        if(response.isdigit()) and int(response) >= bet_min:
-            player_bet = int(response)
-            player_bank -= player_bet
-            loop = False
+        if response == debug:
+            bet_first_born()
         else:
-            print("Invalid response")
+            if(response.isdigit()) and int(response) >= bet_min:
+                player_bet = int(response)
+                player_bank -= player_bet
+                loop = False
+            else:
+                print("Invalid response")
     reset_game()
 
 def play():
