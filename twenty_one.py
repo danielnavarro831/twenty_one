@@ -5,7 +5,9 @@ player_hold = False
 house_hold = False
 initial_draw = True
 game_over = False
+bust = False
 
+victory_score = 21
 game_num = 1
 turn_num = 1
 player_victories = 0
@@ -52,10 +54,10 @@ def reset_game():
          7, 7, 7, 7,
          8, 8, 8, 8,
          9, 9, 9, 9,
-         10, 10, 10, 10,
-         10, 10, 10, 10,
-         10, 10, 10, 10,
-         10, 10, 10, 10]
+         10, 10, 10, 10, #Tens
+         10, 10, 10, 10, #Jacks
+         10, 10, 10, 10, #Queens
+         10, 10, 10, 10] #Kings
 #Initialize Vars
     next_card = 0
     player_hand = []
@@ -74,7 +76,7 @@ def play():
     global game_over
 #Display Game Number Banner
     print("--------------------------------------------------------------")
-    print("                       Game: " + str(game_num) + "            *Wins  P:" + str(player_victories) + "  H:" + str(house_victories) + "   /")
+    print("                       Game: " + str(game_num) + "           * Wins  P:" + str(player_victories) + "  H:" + str(house_victories) + "   /")
     print("-----------------------------------------------------------")
 #Shuffle Deck and Deal Cards    
     random.shuffle(cards)
@@ -108,6 +110,7 @@ def take_turn():
 
 def draw(hand):
     global next_card
+    global bust
     current_player = ""
     if hand == player_hand:
         player_hand.append(cards[next_card])
@@ -119,12 +122,18 @@ def draw(hand):
         print("The " + current_player + " draws: " + str(cards[next_card]))
     else:
         print("The " + current_player + " draws")
+#Check if ace
+    if cards[next_card] == 1:
+        check_ace_value(hand)
     cards.pop(next_card)
     next_card += 1
 #BUST!
     if sum(hand) > 21:
-        print(current_player + " BUSTS!")
-        compare_scores()
+        bust = True
+        check_ace_value(hand)
+        if sum(hand) > 21:
+            print(current_player + " BUSTS!")
+            compare_scores()
 
 def hold_or_hit():
     global player_hold
@@ -156,11 +165,32 @@ def house_check():
         house_hold = True
         print("The House stays")
 
+def set_ace_value(hand):
+    global victory_score
+    hand_total = sum(hand) - 1
+    if hand_total + 11 <= victory_score:
+        hand[-1] = 11
+    else:
+        hand[-1] = 1
+
+def check_ace_value(hand):
+    hand_total = sum(hand)
+    if bust == True:
+        for card in hand:
+            if card == 11:
+                if hand_total - 10 <= victory_score:
+                    hand[card] = 1
+    else:
+        for card in hand:
+            if card == 1:
+                if hand_total + 10 <= victory_score:
+                    hand[card] = 11
+
 def compare_scores():
     global player_victories
     global house_victories
     global game_over
-    VictoryScore = 21
+    global victory_score
 #Show Hands
     player_score = sum(player_hand)
     house_score = sum(house_hand)
@@ -169,22 +199,22 @@ def compare_scores():
         print("Player score: " + str(player_hand) + " = " + str(player_score))
         print("House score: " + str(house_hand) + " = " + str(house_score))
         print("Tie")
-    elif player_score > house_score and player_score <= VictoryScore:
+    elif player_score > house_score and player_score <= victory_score:
         print("Player score: " + str(player_hand) + " = " + str(player_score))
         print("House score: " + str(house_hand) + " = " + str(house_score))
         print("Player wins!")
         player_victories += 1
-    elif player_score < house_score and house_score <= VictoryScore:
+    elif player_score < house_score and house_score <= victory_score:
         print("Player score: " + str(player_hand) + " = " + str(player_score))
         print("House score: " + str(house_hand) + " = " + str(house_score))
         print("House wins!")
         house_victories += 1
-    elif player_score > house_score and player_score > VictoryScore:
+    elif player_score > house_score and player_score > victory_score:
         print("Player score: " + str(player_hand) + " = " + str(player_score))
         print("House score: " + str(house_hand) + " = " + str(house_score))
         print("House wins!")
         house_victories += 1
-    elif house_score > player_score and house_score > VictoryScore:
+    elif house_score > player_score and house_score > victory_score:
         print("Player score: " + str(player_hand) + " = " + str(player_score))
         print("House score: " + str(house_hand) + " = " + str(house_score))
         print("Player wins!")
