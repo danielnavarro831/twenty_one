@@ -7,6 +7,14 @@ initial_draw = True
 game_over = False
 bust = False
 
+#Debug vars
+debug = "pumpkineater"
+debugging_player = False
+debugging_house = False
+debug_value = 0
+force_player_bust = False
+force_house_bust = False
+
 victory_score = 21
 game_num = 1
 turn_num = 1
@@ -31,22 +39,65 @@ cards = [1, 1, 1, 1,
 player_hand = []
 house_hand = []
 
-next_card = 0 #value increases by 1 whenever a card is taken from the deck
+#Debug tools
+def enable_debug():
+    global debugging_player
+    global debugging_house
+    global debug_value
+    loop = True
+    while loop == True:
+        response = input("Debug house or player? ")
+        response.lower()
+        if response == "player":
+            debugging_player = True
+            loop = False
+        elif response == "house":
+            debugging_house = True
+            loop = False
+        else:
+            print("Invalid response")
+    loop = True
+    while loop == True:
+        print("Enter a value between 1 and 10")
+        print("For aces (11) input 1")
+        response = input("Input desired card value: ")
+        if(response.isdigit()) and int(response) <= 10:
+            debug_value = int(response)
+            loop = False
+            reset_game()
+        else:
+            print("Input a valid amount")
 
-#Debug tool
+def force_bust():
+    global force_player_bust
+    global force_house_bust
+    loop = True
+    while loop == True:
+        response = input("Force player or house bust? ")
+        response.lower()
+        if response == "player":
+            force_player_bust = True
+            draw(player_hand)
+            loop = False
+        elif response == "house":
+            force_house_bust = True
+            draw(house_hand)
+            loop = False
+        else:
+            ("Invalid response")
+
 def cheat(card_value): #Call method before initial card draw in play()
-    global next_card
     global cards
     counter = 0
     for card in cards:
         if card == card_value:
-            print("setting")
-            next_card = counter
+            cards[counter] = cards[0]
+            cards[0] = card_value
         counter +=1
 
 def version():
     print("-----------------------------------------------------------------------------------------------------------------------")
-    print("                                     21 Card Game - Code by Daniel Navarro                                 ver: 1.08")
+    print("                                     21 Card Game - Code by Daniel Navarro                                 ver: 1.09")
     print("-----------------------------------------------------------------------------------------------------------------------")
 
 def rules():
@@ -62,11 +113,12 @@ def reset_game():
     global house_hand
     global player_hold
     global player_hand
-    global next_card
     global game_num
     global turn_num
     global initial_draw
     global bust
+    global force_player_bust
+    global force_house_bust
 
 #Reset deck to 52 cards
     cards = [1, 1, 1, 1,
@@ -83,13 +135,14 @@ def reset_game():
          10, 10, 10, 10, #Queens
          10, 10, 10, 10] #Kings
 #Initialize Vars
-    next_card = 0
     player_hand = []
     house_hand = []
     player_hold = False
     house_hold = False
     initial_draw = True
     bust = False
+    force_player_bust = False
+    force_house_bust = False
     game_num += 1
     turn_num = 1
 #Start the game
@@ -105,7 +158,11 @@ def play():
     print("-----------------------------------------------------------")
 #Shuffle Deck and Deal Cards    
     random.shuffle(cards)
+    if debugging_player == True:
+        cheat(debug_value)
     draw(player_hand)
+    if debugging_house == True:
+        cheat(debug_value)
     draw(house_hand)
     draw(player_hand)
     draw(house_hand)
@@ -134,30 +191,38 @@ def take_turn():
 
 
 def draw(hand):
-    global next_card
     global bust
+    global player_hold
+    global house_hold
     current_player = ""
     if hand == player_hand:
-        player_hand.append(cards[next_card])
+        if force_player_bust == True:
+            player_hand.append(22)
+        else:
+            player_hand.append(cards[0])
         current_player = "Player"
     else:
-        house_hand.append(cards[next_card])
+        if force_house_bust == True:
+            house_hand.append(22)
+        else:
+            house_hand.append(cards[0])
         current_player = "House"
     if initial_draw == False:
-        print("The " + current_player + " draws: " + str(cards[next_card]))
+        print("The " + current_player + " draws: " + str(hand[-1]))
     else:
         print("The " + current_player + " draws")
 #Check if ace
     if hand[-1] == 1:
         check_ace_value(hand)
-    cards.pop(next_card)
-    next_card += 1
+    cards.pop(0)
 #BUST!
     if sum(hand) > 21:
         bust = True
         check_ace_value(hand)
         if sum(hand) > 21:
             print(current_player + " BUSTS!")
+            player_hold = True
+            house_hold = True
             compare_scores()
         else:
             bust = False
@@ -168,7 +233,10 @@ def hold_or_hit():
     while loop == True:
 #Ask the player
         print("Player Hand: " + str(player_hand) + " = " + str(sum(player_hand)))
-        print("House Hand: " + str(house_hand[1:len(house_hand)]) + " = " + str(sum(house_hand[1:len(house_hand)])))
+        if debugging_house == True:
+            print("House Hand: " + str(house_hand) + " = " + str(sum(house_hand)))
+        else:
+            print("House Hand: " + str(house_hand[1:len(house_hand)]) + " = " + str(sum(house_hand[1:len(house_hand)])))
 #Player Response        
         response = input("Hold or Hit? ")
         response.lower()
@@ -180,6 +248,9 @@ def hold_or_hit():
             draw(player_hand)
             house_check()
             loop = False
+        elif response == "bust":
+            force_bust()
+            loop = False
         else:
             print("invalid input")
 
@@ -187,12 +258,11 @@ def house_check():
     global house_hold
     global game_over
 #Casino Requirement
-    if game_over == False:
-        if sum(house_hand) < 17:
-            draw(house_hand)
-        else:
-            house_hold = True
-            print("The House stays")
+    if sum(house_hand) < 17:
+        draw(house_hand)
+    else:
+        house_hold = True
+        print("The House stays")
 
 def check_ace_value(hand):
     hand_total = sum(hand)
@@ -215,6 +285,8 @@ def compare_scores():
     global house_victories
     global game_over
     global victory_score
+    global debugging_player
+    global debugging_house
 #Show Hands
     player_score = sum(player_hand)
     house_score = sum(house_hand)
@@ -249,6 +321,8 @@ def compare_scores():
         print("House score: " + str(house_hand) + " = " + str(house_score))
 #Play Again?    
     loop = True
+    debugging_player = False
+    debugging_house = False
     while loop == True:
         response = input("Play again? (Yes/No) ")
         response.lower()
@@ -258,6 +332,9 @@ def compare_scores():
         elif response == "no":
             print("Thanks for playing!")
             game_over = True
+            loop = False
+        elif response == debug:
+            enable_debug()
             loop = False
         else:
             print("Invalid option")
