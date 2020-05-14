@@ -44,6 +44,11 @@ def cheat(card_value): #Call method before initial card draw in play()
             next_card = counter
         counter +=1
 
+def version():
+    print("------------------------------------------------------------------------------------------------------------")
+    print("                                  21 Card Game - Code by Daniel Navarro                         ver: 1.07")
+    print("------------------------------------------------------------------------------------------------------------")
+
 def reset_game():
     global cards
     global house_hold
@@ -87,6 +92,8 @@ def play():
     global initial_draw
     global turn_num
     global game_over
+#Display Title and Version
+    version()
 #Display Game Number Banner
     print("--------------------------------------------------------------")
     print("                       Game: " + str(game_num) + "           * Wins  P:" + str(player_victories) + "  H:" + str(house_victories) + "   /")
