@@ -33,13 +33,16 @@ house_hand = []
 
 next_card = 0 #value increases by 1 whenever a card is taken from the deck
 
-def cheat(card_value):
+#Debug tool
+def cheat(card_value): #Call method before initial card draw in play()
     global next_card
     global cards
+    counter = 0
     for card in cards:
         if card == card_value:
             print("setting")
-            next_card = card
+            next_card = counter
+        counter +=1
 
 def reset_game():
     global cards
@@ -90,8 +93,6 @@ def play():
     print("-----------------------------------------------------------")
 #Shuffle Deck and Deal Cards    
     random.shuffle(cards)
-    #cheat(1)
-    #print(next_card)
     draw(player_hand)
     draw(house_hand)
     draw(player_hand)
@@ -135,15 +136,14 @@ def draw(hand):
     else:
         print("The " + current_player + " draws")
 #Check if ace
-    #if hand[-1] == 1:
-        #print("ace detected")
-        #check_ace_value(hand)
+    if hand[-1] == 1:
+        check_ace_value(hand)
     cards.pop(next_card)
     next_card += 1
 #BUST!
     if sum(hand) > 21:
         bust = True
-        #check_ace_value(hand)
+        check_ace_value(hand)
         if sum(hand) > 21:
             print(current_player + " BUSTS!")
             compare_scores()
@@ -156,7 +156,8 @@ def hold_or_hit():
     while loop == True:
 #Ask the player
         print("Player Hand: " + str(player_hand) + " = " + str(sum(player_hand)))
-        print("House Hand: " + str(house_hand[1:len(house_hand)]) + " = " + str(sum(house_hand[1:len(house_hand)])))
+        #print("House Hand: " + str(house_hand[1:len(house_hand)]) + " = " + str(sum(house_hand[1:len(house_hand)])))
+        print("House Hand: " + str(house_hand) + " = " + str(sum(house_hand)))
 #Player Response        
         response = input("Hold or Hit? ")
         response.lower()
@@ -180,32 +181,22 @@ def house_check():
         house_hold = True
         print("The House stays")
 
-def set_ace_value(hand):
-    global victory_score
-    hand_total = sum(hand) - 1
-    if hand_total + 11 <= victory_score:
-        hand[-1] = 11
-    else:
-        hand[-1] = 1
-
-def check_ace_value(Hand):
-    hand = []
-    hand = Hand
-    print("checking ace value")
+def check_ace_value(hand):
     hand_total = sum(hand)
+    counter = 0
     if bust == True:
         for card in hand:
-            if hand[card] == 11:
+            if hand[counter] == 11:
                 if hand_total - 10 <= victory_score:
-                    hand[card] = 1
+                    hand[counter] = 1
+            counter +=1
     else:
         for card in hand:
-            if hand[card] == 1:
-                print("detected ace in hand as 1")
+            if hand[counter] == 1:
                 if hand_total + 10 <= victory_score:
-                    print("can be convereted to 11")
-                    hand[card] = 11
-                    print("ace: " + str(hand[card]))
+                    hand[counter] = 11
+                    print("ace: " + str(hand[counter]))
+            counter +=1
 
 def compare_scores():
     global player_victories
