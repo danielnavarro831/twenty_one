@@ -33,6 +33,14 @@ house_hand = []
 
 next_card = 0 #value increases by 1 whenever a card is taken from the deck
 
+def cheat(card_value):
+    global next_card
+    global cards
+    for card in cards:
+        if card == card_value:
+            print("setting")
+            next_card = card
+
 def reset_game():
     global cards
     global house_hold
@@ -43,6 +51,7 @@ def reset_game():
     global game_num
     global turn_num
     global initial_draw
+    global bust
 
 #Reset deck to 52 cards
     cards = [1, 1, 1, 1,
@@ -65,6 +74,7 @@ def reset_game():
     player_hold = False
     house_hold = False
     initial_draw = True
+    bust = False
     game_num += 1
     turn_num = 1
 #Start the game
@@ -80,6 +90,8 @@ def play():
     print("-----------------------------------------------------------")
 #Shuffle Deck and Deal Cards    
     random.shuffle(cards)
+    #cheat(1)
+    #print(next_card)
     draw(player_hand)
     draw(house_hand)
     draw(player_hand)
@@ -123,17 +135,20 @@ def draw(hand):
     else:
         print("The " + current_player + " draws")
 #Check if ace
-    if cards[next_card] == 1:
-        check_ace_value(hand)
+    #if hand[-1] == 1:
+        #print("ace detected")
+        #check_ace_value(hand)
     cards.pop(next_card)
     next_card += 1
 #BUST!
     if sum(hand) > 21:
         bust = True
-        check_ace_value(hand)
+        #check_ace_value(hand)
         if sum(hand) > 21:
             print(current_player + " BUSTS!")
             compare_scores()
+        else:
+            bust = False
 
 def hold_or_hit():
     global player_hold
@@ -173,18 +188,24 @@ def set_ace_value(hand):
     else:
         hand[-1] = 1
 
-def check_ace_value(hand):
+def check_ace_value(Hand):
+    hand = []
+    hand = Hand
+    print("checking ace value")
     hand_total = sum(hand)
     if bust == True:
         for card in hand:
-            if card == 11:
+            if hand[card] == 11:
                 if hand_total - 10 <= victory_score:
                     hand[card] = 1
     else:
         for card in hand:
-            if card == 1:
+            if hand[card] == 1:
+                print("detected ace in hand as 1")
                 if hand_total + 10 <= victory_score:
+                    print("can be convereted to 11")
                     hand[card] = 11
+                    print("ace: " + str(hand[card]))
 
 def compare_scores():
     global player_victories
