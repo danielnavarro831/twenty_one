@@ -98,7 +98,7 @@ def cheat(card_value): #Call method before initial card draw in play()
 
 def version():
     print("-----------------------------------------------------------------------------------------------------------------------")
-    print("                                     21 Card Game - Code by Daniel Navarro                                    ver: 1.11")
+    print("                                     21 Card Game - Code by Daniel Navarro                                    ver: 1.12")
     print("-----------------------------------------------------------------------------------------------------------------------")
 
 def rules():
@@ -175,7 +175,6 @@ def play():
         turn_num += 1
 #House continues if player holds first
     while player_hold == True and house_hold == False:
-        print("suspected scenario")
         take_turn()
         house_check()
         turn_num += 1
