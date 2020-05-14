@@ -16,10 +16,16 @@ debug_value = 0
 forcing_bust = False
 
 victory_score = 21
-game_num = 1
+game_num = 0
 turn_num = 1
 player_victories = 0
 house_victories = 0
+#Money Vars
+player_bank = 100
+player_won_amount = 0
+house_won_amount = 0
+bet_min = 10
+player_bet = 0
 
 #Deck
 cards = [1, 1, 1, 1,
@@ -44,6 +50,8 @@ def enable_debug():
     global debugging_player
     global debugging_house
     global debug_value
+    global player_bank
+    global bet_min
     loop = True
     while loop == True:
         response = input("Debug house or player? ")
@@ -64,7 +72,8 @@ def enable_debug():
         if(response.isdigit()) and int(response) <= 10:
             debug_value = int(response)
             loop = False
-            reset_game()
+            player_bank += bet_min
+            bet()
         else:
             print("Input a valid amount")
 
@@ -93,6 +102,36 @@ def cheat(card_value): #Call method before initial card draw in play()
             cards[0] = card_value
         counter +=1
 
+def bet():
+    global player_bank
+    global bet_min
+    loop = True
+    while loop == True:
+        print("Minimum bet amount is " + str(bet_min))
+        print("Player bank: " + str(player_bank))
+        response = input("Choose an amount to bet: ")
+        if(response.isdigit()) and int(response) >= bet_min:
+            player_bet = int(response)
+            player_bank -= player_bet
+            loop = False
+        else:
+            print("Invalid response")
+    reset()
+
+def payout(winner):
+    global player_bank
+    global player_bet
+    global player_won_amount
+    global house_won_amount
+    if winner == player:
+        player_bank += player_bet * 2
+        player_won_amount += player_bet * 2
+    elif winner == "house":
+        house_won_amount += player_bet
+    else:
+        player_bank += player_bet
+    player_bet = 0
+
 def version():
     print("-----------------------------------------------------------------------------------------------------------------------")
     print("                                     21 Card Game - Code by Daniel Navarro                                    ver: 1.13")
@@ -100,10 +139,11 @@ def version():
 
 def rules():
     print("Rules:")
+    print("Choose an amount to bet (minimum " + str(bet_min) + ")")
     print("Each player is dealt 2 cards")
+    print("Aces will automatically switch between 11 and 1 to accomodate the player's current score")
     print("Each turn, each player will be asked if they would like to hit (draw) or hold")
     print("The player with the closest score to 21 wins")
-    print("Aces will automatically switch between 11 and 1 to accomodate the player's current score")
 
 def reset_game():
     global cards
@@ -289,10 +329,7 @@ def check_ace_value(hand):
 def compare_scores():
     global player_victories
     global house_victories
-    global game_over
     global victory_score
-    global debugging_player
-    global debugging_house
 #Show Hands
     player_score = sum(player_hand)
     house_score = sum(house_hand)
@@ -301,49 +338,66 @@ def compare_scores():
         print("Player score: " + str(player_hand) + " = " + str(player_score))
         print("House score: " + str(house_hand) + " = " + str(house_score))
         print("Tie")
+        payout("Tie")
     elif player_score > house_score and player_score <= victory_score:
         print("Player score: " + str(player_hand) + " = " + str(player_score))
         print("House score: " + str(house_hand) + " = " + str(house_score))
         print("Player wins!")
         player_victories += 1
+        payout("player")
     elif player_score < house_score and house_score <= victory_score:
         print("Player score: " + str(player_hand) + " = " + str(player_score))
         print("House score: " + str(house_hand) + " = " + str(house_score))
         print("House wins!")
         house_victories += 1
+        payout("house")
     elif player_score > house_score and player_score > victory_score:
         print("Player score: " + str(player_hand) + " = " + str(player_score))
         print("House score: " + str(house_hand) + " = " + str(house_score))
         print("House wins!")
         house_victories += 1
+        payout("house")
     elif house_score > player_score and house_score > victory_score:
         print("Player score: " + str(player_hand) + " = " + str(player_score))
         print("House score: " + str(house_hand) + " = " + str(house_score))
         print("Player wins!")
         player_victories += 1
+        payout("player")
     else:
         print("unforseen situation")
         print("Player score: " + str(player_hand) + " = " + str(player_score))
         print("House score: " + str(house_hand) + " = " + str(house_score))
-#Play Again?    
-    loop = True
-    debugging_player = False
-    debugging_house = False
-    while loop == True:
-        response = input("Play again? (Yes/No) ")
-        response.lower()
-        if response == "yes":
-            reset_game()
-            loop = False
-        elif response == "no":
-            print("Thanks for playing!")
-            game_over = True
-            loop = False
-        elif response == debug:
-            enable_debug()
-            loop = False
-        else:
-            print("Invalid option")
+
+#Play Again
+def play_again():  
+    global player_bank
+    global bet_min
+    global game_over
+    global debugging_player
+    global debugging_house
+    if player_bank >= bet_min:
+        loop = True
+        debugging_player = False
+        debugging_house = False
+        while loop == True:
+            response = input("Play again? (Yes/No) ")
+            response.lower()
+            if response == "yes":
+                bet()
+                loop = False
+            elif response == "no":
+                print("Thanks for playing!")
+                game_over = True
+                loop = False
+            elif response == debug:
+                enable_debug()
+                loop = False
+            else:
+                print("Invalid option")
+    else:
+        print("Unable to make minimum bet")
+        print("Thanks for playing!")
+        game_over = True
 
 def set_window_size():
     os.system('mode con: cols=120 lines=40')
@@ -355,4 +409,4 @@ version()
 #Display Rules
 rules()
 #Initialize Game
-play()
+bet()
