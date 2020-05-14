@@ -13,8 +13,7 @@ debug = "pumpkineater"
 debugging_player = False
 debugging_house = False
 debug_value = 0
-force_player_bust = False
-force_house_bust = False
+forcing_bust = False
 
 victory_score = 21
 game_num = 1
@@ -70,18 +69,16 @@ def enable_debug():
             print("Input a valid amount")
 
 def force_bust():
-    global force_player_bust
-    global force_house_bust
+    global forcing_bust
     loop = True
     while loop == True:
         response = input("Force player or house bust? ")
         response.lower()
+        forcing_bust = True
         if response == "player":
-            force_player_bust = True
             draw(player_hand)
             loop = False
         elif response == "house":
-            force_house_bust = True
             draw(house_hand)
             loop = False
         else:
@@ -98,7 +95,7 @@ def cheat(card_value): #Call method before initial card draw in play()
 
 def version():
     print("-----------------------------------------------------------------------------------------------------------------------")
-    print("                                     21 Card Game - Code by Daniel Navarro                                    ver: 1.12")
+    print("                                     21 Card Game - Code by Daniel Navarro                                    ver: 1.13")
     print("-----------------------------------------------------------------------------------------------------------------------")
 
 def rules():
@@ -118,8 +115,7 @@ def reset_game():
     global turn_num
     global initial_draw
     global bust
-    global force_player_bust
-    global force_house_bust
+    global forcing_bust
 
 #Reset deck to 52 cards
     cards = [1, 1, 1, 1,
@@ -142,8 +138,7 @@ def reset_game():
     house_hold = False
     initial_draw = True
     bust = False
-    force_player_bust = False
-    force_house_bust = False
+    forcing_bust = False
     game_num += 1
     turn_num = 1
 #Start the game
@@ -196,13 +191,13 @@ def draw(hand):
     global house_hold
     current_player = ""
     if hand == player_hand:
-        if force_player_bust == True:
+        if forcing_bust == True:
             player_hand.append(22)
         else:
             player_hand.append(cards[0])
         current_player = "Player"
     else:
-        if force_house_bust == True:
+        if forcing_bust == True:
             house_hand.append(22)
         else:
             house_hand.append(cards[0])
