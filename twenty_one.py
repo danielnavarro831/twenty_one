@@ -45,9 +45,16 @@ def cheat(card_value): #Call method before initial card draw in play()
         counter +=1
 
 def version():
-    print("------------------------------------------------------------------------------------------------------------")
-    print("                                  21 Card Game - Code by Daniel Navarro                         ver: 1.07")
-    print("------------------------------------------------------------------------------------------------------------")
+    print("-----------------------------------------------------------------------------------------------------------------------")
+    print("                                     21 Card Game - Code by Daniel Navarro                                 ver: 1.08")
+    print("-----------------------------------------------------------------------------------------------------------------------")
+
+def rules():
+    print("Rules:")
+    print("Each player is dealt 2 cards")
+    print("Each turn, each player will be asked if they would like to hit (draw) or hold")
+    print("The player with the closest score to 21 wins")
+    print("Aces will automatically switch between 11 and 1 to accomodate the player's current score")
 
 def reset_game():
     global cards
@@ -92,8 +99,6 @@ def play():
     global initial_draw
     global turn_num
     global game_over
-#Display Title and Version
-    version()
 #Display Game Number Banner
     print("--------------------------------------------------------------")
     print("                       Game: " + str(game_num) + "           * Wins  P:" + str(player_victories) + "  H:" + str(house_victories) + "   /")
@@ -163,8 +168,7 @@ def hold_or_hit():
     while loop == True:
 #Ask the player
         print("Player Hand: " + str(player_hand) + " = " + str(sum(player_hand)))
-        #print("House Hand: " + str(house_hand[1:len(house_hand)]) + " = " + str(sum(house_hand[1:len(house_hand)])))
-        print("House Hand: " + str(house_hand) + " = " + str(sum(house_hand)))
+        print("House Hand: " + str(house_hand[1:len(house_hand)]) + " = " + str(sum(house_hand[1:len(house_hand)])))
 #Player Response        
         response = input("Hold or Hit? ")
         response.lower()
@@ -181,12 +185,14 @@ def hold_or_hit():
 
 def house_check():
     global house_hold
+    global game_over
 #Casino Requirement
-    if sum(house_hand) < 17:
-        draw(house_hand)
-    else:
-        house_hold = True
-        print("The House stays")
+    if game_over == False:
+        if sum(house_hand) < 17:
+            draw(house_hand)
+        else:
+            house_hold = True
+            print("The House stays")
 
 def check_ace_value(hand):
     hand_total = sum(hand)
@@ -202,7 +208,6 @@ def check_ace_value(hand):
             if hand[counter] == 1:
                 if hand_total + 10 <= victory_score:
                     hand[counter] = 11
-                    print("ace: " + str(hand[counter]))
             counter +=1
 
 def compare_scores():
@@ -257,4 +262,9 @@ def compare_scores():
         else:
             print("Invalid option")
 
+#Display Title and Version
+version()
+#Display Rules
+rules()
+#Initialize Game
 play()
